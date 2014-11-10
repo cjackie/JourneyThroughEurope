@@ -19,6 +19,9 @@
         <property name="RIGHT_SEC_WIDTH"            value="196"></property>
         <property name="SPLASH_WIDTH"               value="900"></property>
         <property name="SPLASH_HEIGHT"              value="539"></property>
+        <property name="GAME_ORIGINAL_HEIGHT"       value="2569"></property>
+        <property name="GAME_ORIGINAL_WIDTH"        value="2010"></property>
+        <property name="RADIUS"                     value="20"></property>
         <property name="FLIGHT_BTN"                 value="Flight Plan"></property>
         <property name="SELECT_MAP_BTN"             value="Select Map"></property>
         <property name="HISTORY_BTN"                value="History"></property>
@@ -38,7 +41,15 @@
         <property name="MAP_IMG_1"                  value="gameplay_DF14.jpg"></property>
         <property name="MAP_IMG_2"                  value="gameplay_AC58.jpg"></property>
         <property name="MAP_IMG_3"                  value="gameplay_DF58.jpg"></property>
+        <property name="MAP_IMGO_0"                 value="gameplay_AC14O.jpg"></property>
+        <property name="MAP_IMGO_1"                 value="gameplay_DF14O.jpg"></property>
+        <property name="MAP_IMGO_2"                 value="gameplay_AC58O.jpg"></property>
+        <property name="MAP_IMGO_3"                 value="gameplay_DF58O.jpg"></property>
+        
         <property name="SPLASH_IMG"                 value="Game.JPG"></property>
+        <property name="CITY_NEIGHBOR_FILE"         value="city_neighbor.txt"></property>
+        <property name="CITIES"                     value="cities.txt"></property>
+        <property name="CITY_RADIUS"                value="50"></property>
     </property_list>
     <property_options_list>
         <property_options name="NUM_LIST">
@@ -56,33 +67,6 @@
             <option>flag_red.png</option>
             <option>flag_white.png</option>
             <option>flag_yellow.png</option>
-        </property_options>
-        <property_options name="LEVEL_OPTIONS">
-            <option>Level 1</option>
-            <option>Level 2</option>
-            <option>Level 3</option>
-            <option>Level 4</option>
-            <option>Level 5</option>
-            <option>Level 6</option>
-            <option>Level 7</option>
-        </property_options>
-        <property_options name="LEVEL_IMAGE_NAMES">
-            <option>level_1.png</option>
-            <option>level_2.png</option>
-            <option>level_3.png</option>
-            <option>level_4.png</option>
-            <option>level_5.png</option>
-            <option>level_6.png</option>
-            <option>level_7.png</option>
-        </property_options>
-        <property_options name="LEVEL_FILES">
-            <option>level1.sok</option>
-            <option>level2.sok</option>
-            <option>level3.sok</option>
-            <option>level4.sok</option>
-            <option>level5.sok</option>
-            <option>level6.sok</option>
-            <option>level7.sok</option>
         </property_options>
     </property_options_list>
 </properties>
