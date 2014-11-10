@@ -6,7 +6,6 @@
 
 package test;
 
-import com.sun.org.apache.xalan.internal.xsltc.compiler.util.Type;
 import java.util.TimerTask;
 import javafx.application.Application;
 import javafx.scene.Scene;

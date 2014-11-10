@@ -6,7 +6,11 @@
 
 package game;
 
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
+import properties_manager.PropertiesManager;
 import ui.JourneyUI;
+import ui.Main;
 
 /**
  *
@@ -22,8 +26,38 @@ public class JourneyGameRenderer {
     public JourneyGameRenderer() {}
     
     public void render() {
+        
+        PropertiesManager props = PropertiesManager.getPropertiesManager();
+        
         //TODO
+        //partially done
         //get the gameData and render it
+        
+        GraphicsContext cg = ui.getGamePane().getGameCanvas().getGraphicsContext2D();
+        int h = Integer.parseInt(props.getProperty(Main.JourneyPropertyType.GAME_HEIGHT));
+        int w = Integer.parseInt(props.getProperty(Main.JourneyPropertyType.GAME_WIDTH));
+        cg.clearRect(0, 0, w, h);
+        System.out.println("map id is: " +gameData.getCurrentMap());
+        int mapId = gameData.getCurrentMap();
+        if (mapId == 0) {
+            Image img = new Image("file:"+props.getProperty(Main.JourneyPropertyType.DATA_PATH)+
+                    props.getProperty(Main.JourneyPropertyType.MAP_IMGO_0), w, h, false, true);
+            cg.drawImage(img, 0, 0);
+            
+        } else if (mapId == 1) {
+            Image img = new Image("file:"+props.getProperty(Main.JourneyPropertyType.DATA_PATH)+
+                    props.getProperty(Main.JourneyPropertyType.MAP_IMGO_1), w, h, false, true);
+            cg.drawImage(img, 0, 0);
+        } else if (mapId == 2) {
+            Image img = new Image("file:"+props.getProperty(Main.JourneyPropertyType.DATA_PATH)+
+                    props.getProperty(Main.JourneyPropertyType.MAP_IMGO_2), w, h, false, true);
+            cg.drawImage(img, 0, 0);
+        } else {
+            Image img = new Image("file:"+props.getProperty(Main.JourneyPropertyType.DATA_PATH)+
+                    props.getProperty(Main.JourneyPropertyType.MAP_IMGO_3), w, h, false, true);
+            cg.drawImage(img, 0, 0);
+        }
+        
     }
     
     public void changeMsg(String msg) {

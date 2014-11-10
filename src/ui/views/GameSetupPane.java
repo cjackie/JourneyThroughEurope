@@ -6,6 +6,7 @@
 
 package ui.views;
 
+import com.sun.corba.se.spi.orbutil.fsm.Input;
 import java.util.ArrayList;
 import java.util.HashMap;
 import javafx.collections.FXCollections;
@@ -153,7 +154,7 @@ public class GameSetupPane extends BorderPane {
             computerPlayerChoice = new RadioButton(computerPlayer);
             
             Label nameLable = new Label(name);
-            nameInput = new PasswordField();
+            nameInput = new TextField();
             
             //set up the layout
             this.setAlignment(Pos.CENTER);

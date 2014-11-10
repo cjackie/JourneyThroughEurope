@@ -28,6 +28,8 @@ public class JourneyGameEventHandler {
     
     public void SelectMap(int id) {
         gameManager.selectMap(id);
+        gameManager.getRenderer().getUi().getGamePane().toFront();
+        gameManager.render();
     }
     
     public Boolean flightTo(MouseEvent e) {

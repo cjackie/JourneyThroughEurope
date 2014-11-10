@@ -8,6 +8,7 @@ package ui.views;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -37,13 +38,16 @@ public class HistoryPane extends BorderPane{
         
         this.setTop(header);
         this.setCenter(historyContent);
+        this.setBottom(goBackBtn);
         this.setStyle("-fx-background-color:white;");
+        this.setAlignment(goBackBtn, Pos.CENTER);
         
     }
     
     public void refresh() {
         if (historyContent == null) {
             historyContent = new ScrollPane();
+            historyContent.setFitToWidth(true);
         }
         PropertiesManager props = PropertiesManager.getPropertiesManager();
         String textName = props.getProperty(Main.JourneyPropertyType.HISTORY_TEXT);
@@ -67,7 +71,11 @@ public class HistoryPane extends BorderPane{
             content = "file: " + root+textName +" is not found!!!!";
         }
         
-        historyContent.setContent(new Text(content));
+        Text t = new Text(content);
+        t.setWrappingWidth(
+                Integer.parseInt(props.getProperty(Main.JourneyPropertyType.WINDOW_WIDTH))
+        );
+        historyContent.setContent(t);
         return;
     }
     

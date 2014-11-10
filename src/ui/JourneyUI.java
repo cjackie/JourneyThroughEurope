@@ -7,6 +7,7 @@
 package ui;
 
 import game.JourneyGameEventHandler;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
@@ -107,7 +108,6 @@ public class JourneyUI {
         gamePane.getSelectMapBtn().setOnAction(e->{
             mHandler.respondToSelectMapBtn();
         });
-        
     }
     
     //set up the eventhandlers for game related stuff
@@ -122,6 +122,11 @@ public class JourneyUI {
                     }
                 }
         );
+        gamePane.getQuitBtn().setOnAction(e->{
+            gameHandler.respondToSave();
+            Platform.exit();
+        });
+        
         flightPane.getFlightImg().setOnMouseClicked(
                 new EventHandler<MouseEvent>() {
                     public void handle(MouseEvent event) {

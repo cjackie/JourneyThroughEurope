@@ -34,6 +34,7 @@ public class JourneyFileManager {
         //TODO
         //1 is player, 0 is computer
         //String is the name given to the entity.
+        gameData.init();
     }
     
     public JourneyGameData getGameData() {

@@ -34,7 +34,7 @@ public class AboutPane extends BorderPane {
                 JourneyPropertyType.DATA_PATH);
         path = path+aboutTextFileName;
         
-        String content = null;
+        String content = "";
         try {
             BufferedReader reader = new BufferedReader(new FileReader(path));
             
@@ -47,10 +47,14 @@ public class AboutPane extends BorderPane {
             e.printStackTrace();
         }
         
-        if (content == null ) 
+        if (content == "" ) 
             content = "Missing text file";
+        
+        int w = Integer.parseInt(props.getProperty(JourneyPropertyType.WINDOW_WIDTH));
         ScrollPane textHolder = new ScrollPane();
-        textHolder.setContent(new Text(content));
+        Text txt = new Text(content);
+        txt.setWrappingWidth(w);
+        textHolder.setContent(txt);
         this.setCenter(textHolder);
         
         String btnText = props.getProperty(

@@ -50,6 +50,9 @@ public class JourneyMenuEventHandler {
     }
     
     public void respondToGoBtn() {
+        if (ui.getGameSetupPane().getNumberOfPlayer() == 0) {
+            return;
+        }
         HashMap<String, Integer> config = ui.getGameSetupPane().getConfig();
         if (config == null) {
             System.out.println("The form is not complete!");
@@ -65,9 +68,7 @@ public class JourneyMenuEventHandler {
         p.setNumberOfPlayer(numOfPlayers);
 
         GridPane gridPane = p.getSelectionGrid();
-        for (int i = 0; i < numOfPlayers; i++) {
-            gridPane.getChildren().remove(p.getGrid().get(i));
-        }
+        gridPane.getChildren().clear();
         
         int x = 0;
         int y = 0;
