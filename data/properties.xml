@@ -45,11 +45,15 @@
         <property name="MAP_IMGO_1"                 value="gameplay_DF14O.jpg"></property>
         <property name="MAP_IMGO_2"                 value="gameplay_AC58O.jpg"></property>
         <property name="MAP_IMGO_3"                 value="gameplay_DF58O.jpg"></property>
-        
         <property name="SPLASH_IMG"                 value="Game.JPG"></property>
         <property name="CITY_NEIGHBOR_FILE"         value="city_neighbor.txt"></property>
+        <property name="SEA_NEIGBOR_FILE"           value="sea_neighbor.txt"></property>
         <property name="CITIES"                     value="cities.txt"></property>
         <property name="CITY_RADIUS"                value="50"></property>
+        <property name="CARDS"                      value="cards_file.txt"></property>
+        <property name="DICE_SIDES"                 value="6"></property>
+        <property name="DICE_IMG_FORMAT"            value="die_?.jpg"></property>
+        <property name="FLIGHT_TXT"                 value="flights.txt"></property>     
     </property_list>
     <property_options_list>
         <property_options name="NUM_LIST">

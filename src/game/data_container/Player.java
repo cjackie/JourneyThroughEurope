@@ -12,4 +12,46 @@ package game.data_container;
  */
 public class Player {
     
+    private String currentCity;
+    private boolean isHuman;
+    private String flagPath;
+    private String piecePath;
+    private int numberOfFlightPlan;
+    
+    public Player(String currentCity, boolean isHuman, String flagPath, 
+            String piecePath, int numberOfFlightPlan) {
+        this.currentCity = currentCity;
+        this.isHuman = isHuman;
+        this.flagPath = flagPath;
+        this.piecePath = piecePath;
+        this.numberOfFlightPlan = numberOfFlightPlan;
+    }
+    
+    public String getCurrentCity() {
+        return currentCity;
+    }
+
+    public boolean isIsHuman() {
+        return isHuman;
+    }
+
+    public String getFlagPath() {
+        return flagPath;
+    }
+
+    public String getPiecePath() {
+        return piecePath;
+    }
+
+    public int getNumberOfFlightPlan() {
+        return numberOfFlightPlan;
+    }
+    
+    public void setCurrentCity(String currentCity) {
+        this.currentCity = currentCity;
+    }
+
+    public void setNumberOfFlightPlan(int numberOfFlightPlan) {
+        this.numberOfFlightPlan = numberOfFlightPlan;
+    }
 }

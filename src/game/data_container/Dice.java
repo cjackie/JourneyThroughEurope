@@ -11,5 +11,24 @@ package game.data_container;
  * @author chaojiewang
  */
 public class Dice {
+    String[] diceImgPath;
+    int numOfSides;
     
+    public Dice(String[] imgPath, int numOfSides) {
+        this.diceImgPath = imgPath;
+        this.numOfSides = numOfSides;
+    }
+    
+    //get the number between 1 to numOfSides
+    public int roll() {
+        double random = Math.random();
+        return (int)((random * numOfSides) + 1);
+    }
+    
+    public String getDiceImgPath(int i) {
+        if (i <=0 || i>numOfSides+1) {
+            return null;
+        }
+        return diceImgPath[i-1];
+    }
 }

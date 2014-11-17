@@ -19,6 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import javafx.application.Platform;
 import properties_manager.PropertiesManager;
@@ -50,15 +51,19 @@ public class JourneyGameData {
         this.remainingMove = -1;
         
         //setting up gameMap
+        initGameMap();
         
         //setting up flightCluster
+        initFlightCluster();
         
         //setting up allCities
         initAllCity();
         
         //setting up dice
+        initDice();
         
         //setting up cards
+        initAllCards();
         
         
         //TODO
@@ -111,6 +116,124 @@ public class JourneyGameData {
                 allCities.add(c);
             }
         }
+    }
+    
+    public void initDice() {
+        PropertiesManager props = PropertiesManager.getPropertiesManager();
+        String dataPath = props.getProperty(Main.JourneyPropertyType.DATA_PATH);
+        String diceImgFormat = props.getProperty(Main.JourneyPropertyType.DICE_IMG_FORMAT);
+        int sides = Integer.parseInt(props.getProperty(Main.JourneyPropertyType.DICE_SIDES));
+        String[] diceImg  = new String[sides];
+        for (int i = 1; i <= sides; i++) {
+            String format = diceImgFormat + "";
+            String imgName = format.replace('?', (char)('0'+i));
+            String diceImgPath = dataPath + imgName;
+            if (!existFile(diceImgPath)) {
+                System.err.println("dice img not found!!" + diceImgPath);
+                Platform.exit();
+            }
+            diceImg[i-1] = diceImgPath;
+        }
+        this.dice = new Dice(diceImg, sides);
+    }
+  
+    
+    public void initAllCards() {
+        PropertiesManager props = PropertiesManager.getPropertiesManager();
+        
+        String cardFilePath = props.getProperty(Main.JourneyPropertyType.DATA_PATH) +
+                props.getProperty(Main.JourneyPropertyType.CARDS);
+        
+        List<String> lines = getFile(cardFilePath);
+        
+        cards = new ArrayList<>();
+        
+        for (String line : lines) {
+            String dataPath = props.getProperty(Main.JourneyPropertyType.DATA_PATH);
+            String[] tokens = line.split(",");
+            String color = tokens[0];
+            System.out.println(color);
+            Card.ColorType colorType = null;
+            if (color.equals("RED")) {
+                colorType = Card.ColorType.RED;
+                dataPath = dataPath + "red/";
+            }
+            if (color.equals("GREEN")) {
+                colorType = Card.ColorType.GREEN;
+                dataPath = dataPath + "green/";
+            }
+            if (color.equals("YELLOW")) {
+                colorType = Card.ColorType.YELLOW;
+                dataPath = dataPath + "yellow/";
+            }
+            if (colorType == null) {
+                System.err.println("init cards, invalid format");
+                Platform.exit();
+            }
+            
+            for (int i = 1; i < tokens.length; i++) {
+                String cityName = tokens[i];
+                String frontImg = cityName+".jpg";
+                String backImg = cityName+"_I.jpg";
+                if (!existFile(dataPath + frontImg)) {
+                    System.err.println("city card img is nor found" + dataPath + frontImg);
+                    continue;
+                }
+                
+                if (!existFile(dataPath + backImg)) {
+                    //no instruction card
+                    Card c = new Card(cityName, dataPath + frontImg, false, null, colorType);
+                    cards.add(c);
+                } else {
+                    Card c = new Card(cityName, dataPath + frontImg, true, dataPath + backImg, colorType);
+                    cards.add(c);
+                }    
+            }
+        }
+        
+    }
+    
+    public void initFlightCluster() {
+        PropertiesManager props = PropertiesManager.getPropertiesManager();
+        String flightsDataPath = props.getProperty(Main.JourneyPropertyType.DATA_PATH)
+                + props.getProperty(Main.JourneyPropertyType.FLIGHT_TXT);
+        List<String> lines = getFile(flightsDataPath);
+        flightCluster = new FlightCluster();
+        for (int i = 0; i < lines.size(); i++) {
+            String line = lines.get(i);
+            for (String cityName : line.split(",")) {
+                flightCluster.getFlightZone().put(cityName, i+1);
+            }
+        }
+    }
+    
+    public void initGameMap() {
+        gameMap = new GameMap();
+    }
+    
+    public void constructNewGame(HashMap<String, Integer> config) {
+        //TODO
+        //init players and related
+        
+    }
+    
+      
+    private List<String> getFile(String filePath) {
+        Path path = Paths.get(filePath);
+        List<String> lines = null;
+        try {
+            lines = Files.readAllLines(path);
+        } catch (Exception err) {
+            System.out.println(path.toAbsolutePath()+"   is not found!!!");
+            err.printStackTrace();
+            Platform.exit();
+        }
+        return lines;
+    }
+    
+    private Boolean existFile(String filePath){
+        File f = new File(filePath);
+        return f.exists() && !f.isDirectory();
     }
     
     public GameMap getGameMap() {
