@@ -39,6 +39,24 @@ public class JourneyGameEventHandler {
         gameManager.rollDice();
     }
     
+    public void showInitEffects() {
+        gameManager.getRenderer().showInitEffect();
+    }
+    
+    public void respondToDrag(MouseEvent e) {
+        gameManager.respondToDrag(e.getX(), e.getY());
+    }
+    
+    public void respondToDragProgress(MouseEvent e) {
+        //TODO
+        gameManager.respondToDragProgress(e.getX(), e.getY());
+    }
+    
+    public void respondToDragRelease(MouseEvent e) {
+        //TODO
+        gameManager.respondToDragRelease(e.getX(), e.getY());
+    }
+    
     public void SelectMap(int id) {
         gameManager.selectMap(id);
         gameManager.getRenderer().getUi().getGamePane().toFront();

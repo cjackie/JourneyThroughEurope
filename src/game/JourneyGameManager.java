@@ -8,8 +8,10 @@ package game;
 
 import game.data_container.Card;
 import game.data_container.City;
+import game.data_container.Player;
 import game.file.JourneyFileManager;
 import java.util.ArrayList;
+import javafx.application.Platform;
 import javafx.scene.text.Text;
 
 /**
@@ -31,6 +33,7 @@ public class JourneyGameManager {
     private JourneyFileManager fileManager;
     private JourneyGameData gameData;
     private JourneyGameRenderer renderer;
+    private boolean isDraged = false;
     
     public JourneyGameManager() {}
     
@@ -72,13 +75,14 @@ public class JourneyGameManager {
                 gameData.getCurrentPlayer().setCurrentCity(cityTo);
                 gameData.setState(GameState.MOVING_EFFECT);
                 renderer.showMoving(cityFrom, cityTo);
-                
+                this.checkCards(cityTo);
             } else {
                 displayMsg("moving to "+cityTo+" is not valid");
             }
         }
         return false;
     }
+    
     
     public void nextPlayer() {
         //TODO switch to next player
@@ -120,18 +124,102 @@ public class JourneyGameManager {
     }
     
     public void endOfTurn() {
+        //TODO. this is where computer might start do the job
         System.out.println("require to end turn");
-        //TODO
-        //it end of the turn;
+        if (gameData.getState().equals(GameState.NEXT_PLAYER)) {
+            //ready to move on to the next player
+            Player currentPlayer = gameData.getCurrentPlayer();
+            int index;
+            for (index = 0; index < gameData.getAllPlayers().size();) {
+                if (gameData.getAllPlayers().get(index) == currentPlayer) {
+                    break;
+                }
+                index++;
+            }
+            
+            if (index == gameData.getAllPlayers().size()) {
+                System.err.println("current player is not found on all players?!");
+                Platform.exit();
+            }
+            
+            currentPlayer = gameData.getAllPlayers().get((index+1)%
+                    gameData.getAllPlayers().size());
+            gameData.setCurrentPlayer(currentPlayer);
+            renderer.render();
+            gameData.setState(GameState.WAIT_DICE);
+                  
+        }
     }
     
     public void selectMap(int id) {
         gameData.setCurrentMap(id);
     }
     
+    public void respondToDrag(double x, double y) {
+        if (gameData.getState().equals(GameState.IN_MOVE)) {
+            City cityClicked = gameData.getCityByName(
+                    gameData.getCurrentPlayer().getCurrentCity());
+            if (cityClicked == null) {
+                System.err.println("current city is null?!!");
+                Platform.exit();
+            }
+
+            int cx = cityClicked.getPosX();
+            int cy = cityClicked.getPosY();
+            int cr = cityClicked.getRadius();
+            if ((cx - x) * (cx - x) + (cy - y) * (cy - y) < cr * cr) {
+                isDraged = true;
+            }
+        }
+    }
+    
+    public void respondToDragProgress(double x, double y) {
+        if (isDraged) {
+            renderer.renderCurrentPlayerAt(x, y);
+        }
+    }
+    
+    public void respondToDragRelease(double x, double y) {
+        if (isDraged) {
+            City c = gameData.getCityByPos(x, y);
+            if (c == null) {
+                displayMsg("the move is not valid");
+            } else if (gameData.getGameMap().hasEdge(c.getName(),gameData.getCurrentPlayer().getCurrentCity())) {
+                gameData.getCurrentPlayer().setCurrentCity(c.getName());
+                checkCards(c.getName());
+                
+                //TIP!!!!!!!!!!!!  comment this to debug the map data structure
+                
+                gameData.setRemainingMove(gameData.getRemainingMove() - 1);
+                displayMsg("move remaining:" + getGameData().getRemainingMove());
+                if (gameData.getRemainingMove() == 0) {
+                    gameData.setState(GameState.NEXT_PLAYER);
+                }
+                        
+                //end of TIP      
+            } 
+            renderer.render();
+            isDraged = false;
+        }
+    }
+    
     public Boolean won() {
         //TODO
         return false;
+    }
+    
+    //@
+    private void checkCards(String arrivedCity) {
+        //check if the user has visit a city with cards on the hand
+        for (Card c : gameData.getCurrentPlayer().getCardsOnHand()) {
+            if (c.getCityName().equals(arrivedCity)) {
+                //yes. card on the hand. TODO special instructions will be 
+                //executed.
+                displayMsg("a card on your hand has arrived: " + c.getCityName());
+                gameData.getCurrentPlayer().getCardsOnHand().remove(c);
+                renderer.refreshCards();
+            }
+        }
     }
     
     public void displayMsg(String msg) {

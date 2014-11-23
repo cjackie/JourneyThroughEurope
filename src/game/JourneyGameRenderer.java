@@ -9,17 +9,19 @@ package game;
 import game.data_container.Card;
 import game.data_container.City;
 import game.data_container.Player;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 import javafx.animation.AnimationTimer;
+import javafx.animation.TranslateTransition;
+import javafx.animation.TranslateTransitionBuilder;
 import javafx.application.Platform;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
+import javafx.util.Duration;
 import javax.swing.RepaintManager;
 import properties_manager.PropertiesManager;
 import ui.JourneyUI;
@@ -131,7 +133,13 @@ public class JourneyGameRenderer {
         
         
         //render cards
-        JourneyGameEventHandler gHandler = ui.getGameHandler();
+        refreshCards();
+       
+           
+    }
+    
+    public void refreshCards() {
+       JourneyGameEventHandler gHandler = ui.getGameHandler();
         ui.getGamePane().getCardSection().getChildren().clear();
         for (Card c : gameData.getCurrentPlayer().getCardsOnHand()){
             Image m = c.getFrontImg();
@@ -142,9 +150,36 @@ public class JourneyGameRenderer {
             v.setFitWidth(150);
             v.setPreserveRatio(true);
             ui.getGamePane().getCardSection().getChildren().add(v);
+        } 
+    }
+    
+    public void renderCurrentPlayerAt(double x, double y) {
+        PropertiesManager props = PropertiesManager.getPropertiesManager();
+        GraphicsContext cg = ui.getGamePane().getGameCanvas().getGraphicsContext2D();
+        int h = Integer.parseInt(props.getProperty(Main.JourneyPropertyType.GAME_HEIGHT));
+        int w = Integer.parseInt(props.getProperty(Main.JourneyPropertyType.GAME_WIDTH));
+        cg.clearRect(0, 0, w, h);
+        System.out.println("map id is: " +gameData.getCurrentMap());
+        int mapId = gameData.getCurrentMap();
+        if (mapId == 0) {
+            cg.drawImage(map0, 0, 0);      
+        } else if (mapId == 1) {
+            cg.drawImage(map1, 0, 0);
+        } else if (mapId == 2) {
+            cg.drawImage(map2, 0, 0);
+        } else {
+            cg.drawImage(map3, 0, 0);
         }
-       
-           
+        
+        //render the piece
+        int pieceHeight = 50;
+        int pieceWidth = 50;
+        int currrentMap = gameData.getCurrentMap();
+        
+        Player p = gameData.getCurrentPlayer();
+
+        cg.drawImage(p.getPieceImg(), x - pieceWidth / 2, y - pieceHeight,
+                pieceWidth, pieceHeight);    
     }
     
     public void showMoving(String cityFrom, String cityTo) {
@@ -260,18 +295,28 @@ public class JourneyGameRenderer {
                     before = now;
                 }
                 
-                if (now - before > interval) {
-                    if (time == 10) {
-                        gameData.setState(JourneyGameManager.GameState.IN_MOVE);
+                if (time  > 10 ) {
+                    if (now - before > 100000000)
                         this.stop();
+                }
+                
+                
+                if (now - before > interval && time <= 10) {
+                    if (time == 10) {
+                        ui.getGamePane().getDiceImg().setImage(
+                                gameData.getDice().getDiceImg(
+                                        gameData.getDice().getDiceNum()));
+                        gameData.setState(JourneyGameManager.GameState.IN_MOVE);
+                        time++;
+                    } else {
+                        int sides = gameData.getDice().getNumOfSides();
+
+                        int aSide = (int) (sides * Math.random()) + 1;
+                        Image aSideImg = gameData.getDice().getDiceImg(aSide);
+                        ui.getGamePane().getDiceImg().setImage(aSideImg);
+                        before = now;
+                        time++;
                     }
-                    int sides = gameData.getDice().getNumOfSides();
-                        
-                    int aSide = (int)(sides * Math.random()) +1;
-                    Image aSideImg = gameData.getDice().getDiceImg(aSide);
-                    ui.getGamePane().getDiceImg().setImage(aSideImg);
-                    before = now;
-                    time++;
                 }
                 
             }
@@ -314,6 +359,16 @@ public class JourneyGameRenderer {
         }
 
         this.initImgsYet = true;
+    }
+    
+    public void showInitEffect() {
+        TranslateTransition translateTransition =
+            new TranslateTransition(Duration.millis(2000), ui.getGamePane().getCardSection());
+        translateTransition.setFromY(700);
+        translateTransition.setToY(0);
+        translateTransition.setCycleCount(1);
+        translateTransition.setDelay(Duration.ZERO);
+        translateTransition.play();
     }
     
     

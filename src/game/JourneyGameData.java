@@ -147,6 +147,29 @@ public class JourneyGameData {
         return null;
     }
     
+    //return null if not found
+    public City getCityByPos(double x, double y) {
+        ArrayList<City> cities = this.getAllCities();
+        City city  =  null;
+        if (cities == null) {
+            System.out.println("city null!!!");
+        }
+        for (int i = 0; i < cities.size(); i++){
+            City c = cities.get(i);
+            if (c.getMapId() != this.getCurrentMap())
+                continue;
+         
+            int posX = c.getPosX();
+            int posY = c.getPosY();
+            int radius = c.getRadius();
+            if (radius*radius > ((posX-x)*(posX-x) + (posY-y)*(posY-y))) {
+                city = c;
+                break;
+            }  
+        }
+        return city;
+    }
+    
     
     private void initAllCity() {
         PropertiesManager props = PropertiesManager.getPropertiesManager();

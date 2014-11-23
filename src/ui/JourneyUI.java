@@ -10,7 +10,9 @@ import game.JourneyGameEventHandler;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.event.Event;
 import javafx.event.EventHandler;
+import javafx.scene.input.MouseDragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import ui.views.*;
@@ -122,6 +124,33 @@ public class JourneyUI {
                     }
                 }
         );
+        
+        gamePane.getGameCanvas().setOnMousePressed(new EventHandler<MouseEvent>(){
+
+            @Override
+            public void handle(MouseEvent event) {
+                gameHandler.respondToDrag(event);
+            }
+            
+        });
+        gamePane.getGameCanvas().setOnMouseDragged(new EventHandler<MouseEvent>(){
+
+            @Override
+            public void handle(MouseEvent event) {
+                gameHandler.respondToDragProgress(event);
+            }
+            
+        });
+        
+        gamePane.getGameCanvas().setOnMouseReleased(new EventHandler<MouseEvent>() {
+
+            @Override
+            public void handle(MouseEvent event) {
+                gameHandler.respondToDragRelease(event);
+            }
+            
+        });
+        
         gamePane.getDiceImg().setOnMouseClicked(e->{
             gameHandler.respondToRollDice();
         });

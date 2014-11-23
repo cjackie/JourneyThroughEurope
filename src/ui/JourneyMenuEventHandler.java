@@ -62,6 +62,7 @@ public class JourneyMenuEventHandler {
             ui.getGameHandler().getGameManager().displayMsg("Welcome to Journey through europe - The "
                 + "worst game I have ever played");
             ui.getGamePane().toFront();
+            ui.getGameHandler().showInitEffects();
         }   
     }
     
