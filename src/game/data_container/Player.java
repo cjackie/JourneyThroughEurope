@@ -6,6 +6,9 @@
 
 package game.data_container;
 
+import java.util.ArrayList;
+import javafx.scene.image.Image;
+
 /**
  *
  * @author chaojiewang
@@ -14,29 +17,32 @@ public class Player {
     
     private String currentCity;
     private boolean isHuman;
-    private String flagPath;
     private String piecePath;
     private int numberOfFlightPlan;
-    
-    public Player(String currentCity, boolean isHuman, String flagPath, 
-            String piecePath, int numberOfFlightPlan) {
+    private String playerName;
+    private ArrayList<Card> cardsOnHand;
+    private Image pieceImg;
+
+    public Player(String currentCity, boolean isHuman,
+            String piecePath, int numberOfFlightPlan, String playerName) {
         this.currentCity = currentCity;
         this.isHuman = isHuman;
-        this.flagPath = flagPath;
         this.piecePath = piecePath;
         this.numberOfFlightPlan = numberOfFlightPlan;
+        this.playerName = playerName;
+        initImgs();
     }
     
     public String getCurrentCity() {
         return currentCity;
     }
+        
+    public String getPlayerName() {
+        return playerName;
+    }
 
     public boolean isIsHuman() {
         return isHuman;
-    }
-
-    public String getFlagPath() {
-        return flagPath;
     }
 
     public String getPiecePath() {
@@ -54,4 +60,22 @@ public class Player {
     public void setNumberOfFlightPlan(int numberOfFlightPlan) {
         this.numberOfFlightPlan = numberOfFlightPlan;
     }
+    
+    public void setCardsOnHand(ArrayList<Card> cardsOnHand) {
+        this.cardsOnHand = cardsOnHand;
+    }
+
+    public ArrayList<Card> getCardsOnHand() {
+        return cardsOnHand;
+    }
+    
+    public Image getPieceImg() {
+        return pieceImg;
+    }
+
+    
+    private void initImgs() {
+        pieceImg = new Image("file:"+piecePath);
+    }
+    
 }

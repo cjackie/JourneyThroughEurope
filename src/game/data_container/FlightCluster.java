@@ -14,6 +14,7 @@ import java.util.HashMap;
  */
 public class FlightCluster {
     
+    //Strin is the city name and int is the Zone numebr on the map
     private HashMap<String, Integer> flightZone;
 
     public FlightCluster() {

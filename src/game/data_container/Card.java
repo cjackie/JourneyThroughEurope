@@ -6,6 +6,8 @@
 
 package game.data_container;
 
+import javafx.scene.image.Image;
+
 /**
  *
  * @author chaojiewang
@@ -20,19 +22,31 @@ public class Card {
     private String cityImgPath;
     private String cityName;
     private ColorType color;
-    
+    private Image frontImg;
+    private Image backImg;
+
     public Card(String cityName, String cityImgPath, boolean t, String instructionPath, ColorType c){
         this.cityName = cityName;
         this.cityImgPath = cityImgPath;
         this.hasInstruction = t;
         this.instructionPath = instructionPath;
         this.color = c;
+        initImgs();
     }
     
-    public Boolean isHasInstruction() {
+    
+    public boolean isHasInstruction() {
         return hasInstruction;
     }
 
+    public Image getFrontImg() {
+        return frontImg;
+    }
+
+    public Image getBackImg() {
+        return backImg;
+    }
+    
     public String getInstructionPath() {
         return instructionPath;
     }
@@ -44,4 +58,17 @@ public class Card {
     public String getCityName() {
         return cityName;
     }
+    
+    public ColorType getColor() {
+        return color;
+    }
+    
+    private void initImgs() {
+        Image front = new Image("file:"+cityImgPath);
+        frontImg = front;
+        if (isHasInstruction()) {
+            backImg = new Image("file:"+instructionPath);
+        } 
+    }
+    
 }

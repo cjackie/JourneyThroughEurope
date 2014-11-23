@@ -20,7 +20,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.TreeSet;
 import javafx.application.Platform;
 import properties_manager.PropertiesManager;
 import ui.Main;
@@ -30,7 +33,7 @@ import ui.Main;
  * @author chaojiewang
  */
 public class JourneyGameData {
-
+    
     private int currentMap;
     private int remainingMove;
     private GameMap gameMap;
@@ -41,6 +44,11 @@ public class JourneyGameData {
     private Dice dice;
     private ArrayList<Card> cards;
     private ArrayList<Player> humanPlayers;
+    private JourneyGameManager.GameState state;
+    private ArrayList<Card> redCards;
+    private ArrayList<Card> greenCards;
+    private ArrayList<Card> yellowCards;
+
 
     
     public JourneyGameData() {}
@@ -72,6 +80,73 @@ public class JourneyGameData {
         or load it from the file.
         */
     }
+    
+    public void constructNewGame(HashMap<String, Integer> config) {
+        //TODO
+        //init players and related
+        PropertiesManager props = PropertiesManager.getPropertiesManager();
+        String dataPath = props.getProperty(Main.JourneyPropertyType.DATA_PATH);
+        String pieceFormat = props.getProperty(Main.JourneyPropertyType.PIECE_PATH_FORMAT);
+        int flightPlan = Integer.parseInt(props.getProperty(
+                Main.JourneyPropertyType.NUM_FLIGHT_PLANS));
+        
+        allPlayers = new ArrayList<>();
+        int i = 0;
+        for(Entry<String, Integer> entry : config.entrySet()) {
+            String key = entry.getKey();
+            int mode = entry.getValue();
+            System.out.println("in config:" + key +" ->" + mode);
+            //player(1) or computer player(0);
+            if (mode == 0){
+                String piecePath = dataPath + pieceFormat.replace('?', (char)('0'+i));
+                //generate a random city to land on
+                String aCity = allCities.get(i).getName();
+                    Player p = new Player(aCity, false, piecePath, flightPlan,key);
+                dealCards(p);
+                allPlayers.add(p);
+            } else {
+                String piecePath = dataPath + pieceFormat.replace('?', (char)('0'+i));
+                //generate a random city to land on
+                String aCity = allCities.get(i).getName();
+                Player p = new Player(aCity, false, piecePath, flightPlan,key);
+                dealCards(p);
+                allPlayers.add(p);
+            }   
+            i++;
+        }
+        
+        currentPlayer = allPlayers.get(0);
+        
+        for (Player p : allPlayers) {
+            System.out.println("player info:");
+            System.out.println(p.getCurrentCity() + " " +p.getPiecePath());
+        }
+        
+        state = JourneyGameManager.GameState.WAIT_DICE;
+        //show intro effects
+        //showGameIntroEffects();
+        
+        //now all data are available, initial stuff
+        
+        
+    }
+    
+    //return City if found
+    //return null otherwise
+    public City getCityByName(String cityName) {
+        if (allCities == null) {
+            System.err.println("gameData has no allCity info!!!");
+            return null;
+        }
+        
+        for (City c : allCities) {
+            if (c.getName().equals(cityName)) 
+                return c;
+        }
+        
+        return null;
+    }
+    
     
     private void initAllCity() {
         PropertiesManager props = PropertiesManager.getPropertiesManager();
@@ -118,12 +193,12 @@ public class JourneyGameData {
         }
     }
     
-    public void initDice() {
+    private void initDice() {
         PropertiesManager props = PropertiesManager.getPropertiesManager();
         String dataPath = props.getProperty(Main.JourneyPropertyType.DATA_PATH);
         String diceImgFormat = props.getProperty(Main.JourneyPropertyType.DICE_IMG_FORMAT);
         int sides = Integer.parseInt(props.getProperty(Main.JourneyPropertyType.DICE_SIDES));
-        String[] diceImg  = new String[sides];
+        ArrayList<String> diceImg  = new ArrayList<String>();
         for (int i = 1; i <= sides; i++) {
             String format = diceImgFormat + "";
             String imgName = format.replace('?', (char)('0'+i));
@@ -132,13 +207,17 @@ public class JourneyGameData {
                 System.err.println("dice img not found!!" + diceImgPath);
                 Platform.exit();
             }
-            diceImg[i-1] = diceImgPath;
+            diceImg.add(diceImgPath);
         }
-        this.dice = new Dice(diceImg, sides);
+        String[] finalDiceImgs = new String[diceImg.size()];
+        for (int i = 0; i < diceImg.size(); i++) {
+            finalDiceImgs[i] = diceImg.get(i);
+        }
+        this.dice = new Dice(finalDiceImgs, sides);
     }
   
     
-    public void initAllCards() {
+    private void initAllCards() {
         PropertiesManager props = PropertiesManager.getPropertiesManager();
         
         String cardFilePath = props.getProperty(Main.JourneyPropertyType.DATA_PATH) +
@@ -191,9 +270,22 @@ public class JourneyGameData {
             }
         }
         
+        //sort the card in different colors
+        redCards = new ArrayList<>();
+        greenCards = new ArrayList<>();
+        yellowCards = new ArrayList<>();
+        for (Card c : cards) {
+            if (c.getColor().equals(Card.ColorType.GREEN)) 
+                greenCards.add(c);
+            else if (c.getColor().equals(Card.ColorType.RED))
+                redCards.add(c);
+            else
+                yellowCards.add(c);
+        }
+        
     }
     
-    public void initFlightCluster() {
+    private void initFlightCluster() {
         PropertiesManager props = PropertiesManager.getPropertiesManager();
         String flightsDataPath = props.getProperty(Main.JourneyPropertyType.DATA_PATH)
                 + props.getProperty(Main.JourneyPropertyType.FLIGHT_TXT);
@@ -207,17 +299,24 @@ public class JourneyGameData {
         }
     }
     
-    public void initGameMap() {
+    private void initGameMap() {
         gameMap = new GameMap();
     }
     
-    public void constructNewGame(HashMap<String, Integer> config) {
-        //TODO
-        //init players and related
+    
+    private void dealCards(Player p) {
+        ArrayList<Card> cardsOnHand = new ArrayList<>();
         
+        int i = (int)(Math.random() * redCards.size());
+        cardsOnHand.add(redCards.get(i));
+        i = (int)(Math.random() * greenCards.size());
+        cardsOnHand.add(greenCards.get(i));
+        i = (int)(Math.random() * yellowCards.size());
+        cardsOnHand.add(yellowCards.get(i));
+        
+        p.setCardsOnHand(cardsOnHand); 
     }
     
-      
     private List<String> getFile(String filePath) {
         Path path = Paths.get(filePath);
         List<String> lines = null;
@@ -315,4 +414,13 @@ public class JourneyGameData {
     public void setCurrentMap(int currentMap) {
         this.currentMap = currentMap;
     }
+    
+    public void setState(JourneyGameManager.GameState state) {
+        this.state = state;
+    }
+
+    public JourneyGameManager.GameState getState() {
+        return state;
+    }
+
 }

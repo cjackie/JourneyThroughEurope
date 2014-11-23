@@ -9,6 +9,7 @@ package ui.views;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
@@ -33,9 +34,11 @@ public class GamePane extends BorderPane {
     private Button selectMapBtn;
     private Button historyBtn;
     private Button flightBtn;
+    private Button endBtn;
     private Button aboutBtn;
     private Button quitBtn;
     private StackPane gameContainer;
+    
     
     public GamePane() {
         PropertiesManager props = PropertiesManager.getPropertiesManager();
@@ -51,7 +54,9 @@ public class GamePane extends BorderPane {
         );
         cardSection = new VBox();
         msgBoard = new ScrollPane();
-        leftSection.getChildren().addAll(cardSection, msgBoard);
+        msgBoard.setHbarPolicy(ScrollBarPolicy.NEVER);
+        msgBoard.setVbarPolicy(ScrollBarPolicy.ALWAYS);
+        leftSection.getChildren().addAll(cardSection);
         
         rightSection = new VBox();
         diceImg = new ImageView();
@@ -59,14 +64,16 @@ public class GamePane extends BorderPane {
                 props.getProperty(Main.JourneyPropertyType.FLIGHT_BTN));
         selectMapBtn = new Button(
                 props.getProperty(Main.JourneyPropertyType.SELECT_MAP_BTN));
+        endBtn = new Button(
+                props.getProperty(Main.JourneyPropertyType.END_BTN));
         historyBtn = new Button(
                 props.getProperty(Main.JourneyPropertyType.HISTORY_BTN));
         aboutBtn = new Button(
                 props.getProperty(Main.JourneyPropertyType.ABOUT_BTN));
         quitBtn = new Button(
                 props.getProperty(Main.JourneyPropertyType.QUIT_BTN));
-        rightSection.getChildren().addAll(diceImg, flightBtn, selectMapBtn,
-                                        historyBtn, aboutBtn, quitBtn);
+        rightSection.getChildren().addAll(diceImg, flightBtn, selectMapBtn, endBtn,
+                                        historyBtn, aboutBtn, quitBtn,msgBoard);
         rightSection.setPrefWidth(
             Integer.parseInt(props.getProperty(Main.JourneyPropertyType.RIGHT_SEC_WIDTH))
         );
@@ -96,6 +103,10 @@ public class GamePane extends BorderPane {
 
     public Button getFlightBtn() {
         return flightBtn;
+    }
+    
+    public Button getEndBtn() {
+        return endBtn;
     }
 
     public Button getAboutBtn() {

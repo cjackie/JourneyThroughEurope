@@ -105,6 +105,12 @@ public class GameSetupPane extends BorderPane {
                 config.put(p.nameInput.getText(), 0);
             }
         }
+        
+        //check if there is a duplicates
+        if (config.entrySet().size() < numberOfPlayer) {
+            return null;
+        }
+        
         return config;
     }
     

@@ -6,6 +6,7 @@
 
 package game;
 
+import game.data_container.Card;
 import javafx.scene.input.MouseEvent;
 
 /**
@@ -24,6 +25,18 @@ public class JourneyGameEventHandler {
     
     public Boolean moveTo(MouseEvent e) {
         return gameManager.moveTo(e.getX(), e.getY());
+    }
+    
+    public void respondToCardClick(Card c) {
+        gameManager.cardClick(c);
+    }
+    
+    public void respondToEndBtn() {
+        gameManager.endOfTurn();
+    }
+    
+    public void respondToRollDice() {
+        gameManager.rollDice();
     }
     
     public void SelectMap(int id) {
@@ -46,6 +59,11 @@ public class JourneyGameEventHandler {
     
     public Boolean rollDce() {
         return gameManager.rollDice();
+    }
+    
+    
+    public JourneyGameManager getGameManager() {
+        return gameManager;
     }
     
 }

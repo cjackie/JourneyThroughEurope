@@ -9,9 +9,10 @@ package game.data_container;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
+import java.util.ArrayList;  
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javafx.application.Platform;
 import properties_manager.PropertiesManager;
 import ui.Main;
@@ -70,13 +71,29 @@ public class GameMap {
     }
     
     public boolean hasEdge(String cityName1, String cityName2) {
-        //TODO
+        ArrayList<String> potentialEdges = getLandNeighbors(cityName1);
+        if (potentialEdges == null) {
+            return false;
+        }
+        for (String edge : potentialEdges) {
+            if (edge.equals(cityName2)) 
+                return true;
+        }
         return false;
     }
     
     public boolean neigborHarbor(String harbor1, String harbor2) {
         //TODO
         return false;
+    }
+    
+    //null is no neigbors
+    public ArrayList<String> getLandNeighbors(String cityName) {
+        for (Map.Entry<String, ArrayList<String>> entry : cityMap.entrySet()) {
+            if (entry.getKey().equals(cityName)) 
+                return entry.getValue();
+        }
+        return null;
     }
     
     private List<String> getFile(String filePath) {

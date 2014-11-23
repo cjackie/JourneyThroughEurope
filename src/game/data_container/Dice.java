@@ -6,29 +6,71 @@
 
 package game.data_container;
 
+import javafx.scene.image.Image;
+
 /**
  *
  * @author chaojiewang
  */
 public class Dice {
-    String[] diceImgPath;
-    int numOfSides;
-    
+    private String[] diceImgPath;
+    private int numOfSides;
+    private int diceNum;
+    private Image[] diceImgs;
+
     public Dice(String[] imgPath, int numOfSides) {
         this.diceImgPath = imgPath;
         this.numOfSides = numOfSides;
+        roll();
+        initImgs();
     }
     
     //get the number between 1 to numOfSides
     public int roll() {
         double random = Math.random();
-        return (int)((random * numOfSides) + 1);
+        this.diceNum = (int)((random * numOfSides) + 1);
+        return diceNum;
     }
     
+    //path to the img of the dice
     public String getDiceImgPath(int i) {
         if (i <=0 || i>numOfSides+1) {
             return null;
         }
         return diceImgPath[i-1];
     }
+    
+    //path to the img of the dice
+    //for example int 6 iwll be the 6 dice
+    public Image getDiceImg(int i) {
+        if (i <=0 || i>numOfSides+1) {
+            return null;
+        }
+        return diceImgs[i-1];
+    }
+    
+    public String[] getDiceImgPath() {
+        String[] clonePaths = new String[diceImgPath.length];
+        for (int i = 0; i < diceImgPath.length; i++) {
+            clonePaths[i] = (diceImgPath[i]) + "";
+        }
+        return clonePaths;
+    }
+    
+    public int getDiceNum() {
+        return diceNum;
+    }
+    
+    private void initImgs() {
+        diceImgs = new Image[diceImgPath.length];
+        for (int i = 0; i < diceImgPath.length; i++) {
+            Image img = new Image("file:"+diceImgPath[i]);
+            diceImgs[i] = img;
+        }
+    }
+    
+    public int getNumOfSides() {
+        return numOfSides;
+    }
+    
 }

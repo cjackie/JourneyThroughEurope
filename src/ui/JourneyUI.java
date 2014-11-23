@@ -122,6 +122,12 @@ public class JourneyUI {
                     }
                 }
         );
+        gamePane.getDiceImg().setOnMouseClicked(e->{
+            gameHandler.respondToRollDice();
+        });
+        gamePane.getEndBtn().setOnAction(e->{
+            gameHandler.respondToEndBtn();
+        });
         gamePane.getQuitBtn().setOnAction(e->{
             gameHandler.respondToSave();
             Platform.exit();

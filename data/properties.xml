@@ -24,6 +24,7 @@
         <property name="RADIUS"                     value="20"></property>
         <property name="FLIGHT_BTN"                 value="Flight Plan"></property>
         <property name="SELECT_MAP_BTN"             value="Select Map"></property>
+        <property name="END_BTN"                    value="End the Turn"></property>
         <property name="HISTORY_BTN"                value="History"></property>
         <property name="ABOUT_BTN"                  value="About"></property>
         <property name="QUIT_BTN"                   value="Quit"></property>
@@ -53,7 +54,9 @@
         <property name="CARDS"                      value="cards_file.txt"></property>
         <property name="DICE_SIDES"                 value="6"></property>
         <property name="DICE_IMG_FORMAT"            value="die_?.jpg"></property>
-        <property name="FLIGHT_TXT"                 value="flights.txt"></property>     
+        <property name="PIECE_PATH_FORMAT"          value="piece?.png"></property>
+        <property name="FLIGHT_TXT"                 value="flights.txt"></property> 
+        <property name="NUM_FLIGHT_PLANS"           value="3"></property>    
     </property_list>
     <property_options_list>
         <property_options name="NUM_LIST">
