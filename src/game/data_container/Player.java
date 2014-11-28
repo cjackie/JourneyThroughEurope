@@ -22,6 +22,7 @@ public class Player {
     private String playerName;
     private ArrayList<Card> cardsOnHand;
     private Image pieceImg;
+    private boolean waitingOnHarbor;
 
     public Player(String currentCity, boolean isHuman,
             String piecePath, int numberOfFlightPlan, String playerName) {
@@ -30,6 +31,7 @@ public class Player {
         this.piecePath = piecePath;
         this.numberOfFlightPlan = numberOfFlightPlan;
         this.playerName = playerName;
+        this.waitingOnHarbor = false;
         initImgs();
     }
     
@@ -53,6 +55,10 @@ public class Player {
         return numberOfFlightPlan;
     }
     
+    public boolean isWaitingOnHarbor() {
+        return waitingOnHarbor;
+    }
+    
     public void setCurrentCity(String currentCity) {
         this.currentCity = currentCity;
     }
@@ -71,6 +77,10 @@ public class Player {
     
     public Image getPieceImg() {
         return pieceImg;
+    }
+    
+    public void setWaitingOnHarbor(boolean waitingOnHarbor) {
+        this.waitingOnHarbor = waitingOnHarbor;
     }
 
     

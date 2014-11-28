@@ -13,6 +13,8 @@
         <property name="FLIGHT_IMG"                 value="flight_plan.JPG"></property>
         <property name="FLIGHT_IMG_HEIGHT"          value="660"></property>
         <property name="FLIGHT_IMG_WIDTH"           value="600"></property>
+        <property name="FLIGHT_ORIGINAL_WIDTH"      value="1120"></property>
+        <property name="FLIGHT_ORIGINAL_HEIGHT"     value="1232"></property>
         <property name="GAME_WIDTH"                 value="509"></property>
         <property name="GAME_HEIGHT"                value="650"></property>
         <property name="LEFT_SEC_WIDTH"             value="259"></property>
@@ -55,7 +57,7 @@
         <property name="DICE_SIDES"                 value="6"></property>
         <property name="DICE_IMG_FORMAT"            value="die_?.jpg"></property>
         <property name="PIECE_PATH_FORMAT"          value="piece?.png"></property>
-        <property name="FLIGHT_TXT"                 value="flights.txt"></property> 
+        <property name="FLIGHT_TXT"                 value="flight_cluster.txt"></property> 
         <property name="NUM_FLIGHT_PLANS"           value="3"></property>    
     </property_list>
     <property_options_list>

@@ -31,7 +31,7 @@ public class GameMap {
         String cityMapPath = props.getProperty(Main.JourneyPropertyType.DATA_PATH) +
                 props.getProperty(Main.JourneyPropertyType.CITY_NEIGHBOR_FILE);
         String harborMapPath = props.getProperty(Main.JourneyPropertyType.DATA_PATH) +
-                props.getProperty(Main.JourneyPropertyType.CITY_NEIGHBOR_FILE);
+                props.getProperty(Main.JourneyPropertyType.SEA_NEIGBOR_FILE);
         
         //construct city map
         cityMap = new HashMap<>();
@@ -66,8 +66,7 @@ public class GameMap {
                 harborMap.put(tokens[0], edges);
             }
         }
-        
-        
+               
     }
     
     public boolean hasEdge(String cityName1, String cityName2) {
@@ -82,14 +81,31 @@ public class GameMap {
         return false;
     }
     
-    public boolean neigborHarbor(String harbor1, String harbor2) {
-        //TODO
+    //return false if they are not neighbor at sea
+    public boolean neighborHarbor(String harbor1, String harbor2) {
+        ArrayList<String> edges = getHarborNeighbors(harbor1);
+        if (edges ==  null) {
+            return false;
+        }
+        for (String edge : edges) {
+            if (edge.equals(harbor2))
+                return true;
+        }
         return false;
     }
     
     //null is no neigbors
     public ArrayList<String> getLandNeighbors(String cityName) {
         for (Map.Entry<String, ArrayList<String>> entry : cityMap.entrySet()) {
+            if (entry.getKey().equals(cityName)) 
+                return entry.getValue();
+        }
+        return null;
+    }
+    
+    //return null if the city is not a harbor
+    public ArrayList<String> getHarborNeighbors(String cityName) {
+        for (Map.Entry<String, ArrayList<String>> entry : harborMap.entrySet()) {
             if (entry.getKey().equals(cityName)) 
                 return entry.getValue();
         }

@@ -95,7 +95,14 @@ public class JourneyMenuEventHandler {
     }
     
     public void respondToFlightBtn() {
-        ui.getFlightPane().toFront();
+        String currentCity = 
+                ui.getGameHandler().getGameManager().getGameData().getCurrentPlayer().getCurrentCity();
+        if (ui.getGameHandler().getGameManager().
+                getGameData().getFlightCluster().getFlightByName(currentCity) == null) {
+            ui.getGameHandler().getGameManager().displayMsg("This city doesn't have flight!!");
+        } else {
+            ui.getFlightPane().toFront();
+        }
     }
     
     public void respondToSelectMapBtn() {

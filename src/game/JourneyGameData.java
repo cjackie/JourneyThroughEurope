@@ -309,17 +309,7 @@ public class JourneyGameData {
     }
     
     private void initFlightCluster() {
-        PropertiesManager props = PropertiesManager.getPropertiesManager();
-        String flightsDataPath = props.getProperty(Main.JourneyPropertyType.DATA_PATH)
-                + props.getProperty(Main.JourneyPropertyType.FLIGHT_TXT);
-        List<String> lines = getFile(flightsDataPath);
         flightCluster = new FlightCluster();
-        for (int i = 0; i < lines.size(); i++) {
-            String line = lines.get(i);
-            for (String cityName : line.split(",")) {
-                flightCluster.getFlightZone().put(cityName, i+1);
-            }
-        }
     }
     
     private void initGameMap() {

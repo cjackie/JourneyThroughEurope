@@ -66,7 +66,7 @@ public class JourneyGameRenderer {
         int h = Integer.parseInt(props.getProperty(Main.JourneyPropertyType.GAME_HEIGHT));
         int w = Integer.parseInt(props.getProperty(Main.JourneyPropertyType.GAME_WIDTH));
         cg.clearRect(0, 0, w, h);
-        System.out.println("map id is: " +gameData.getCurrentMap());
+        
         int mapId = gameData.getCurrentMap();
         if (mapId == 0) {
             cg.drawImage(map0, 0, 0);      
@@ -109,28 +109,57 @@ public class JourneyGameRenderer {
         ArrayList<String> playerLandNeighbors =
                 gameData.getGameMap().getLandNeighbors(
                         gameData.getCurrentPlayer().getCurrentCity());
-        for (String cityName : playerLandNeighbors) {
-            City currentPlayerCity = gameData.getCityByName(
-                    gameData.getCurrentPlayer().getCurrentCity());
-            City c = gameData.getCityByName(cityName);
-            if (c == null) {
-                System.err.println("what!!, neighbor is not found:" + cityName);
-                Platform.exit();
-            }
-            if (currentPlayerCity == null) {
-                System.err.println("player current city is notfoudn!!" +
+        if (playerLandNeighbors != null) {
+            for (String cityName : playerLandNeighbors) {
+                City currentPlayerCity = gameData.getCityByName(
                         gameData.getCurrentPlayer().getCurrentCity());
-                Platform.exit();
-            }
-            if (currentPlayerCity.getMapId() == currrentMap 
-                    && c.getMapId() == currrentMap ) {
-                cg.setStroke(Color.RED);
-                cg.setLineWidth(2);
-                cg.strokeLine(currentPlayerCity.getPosX(), currentPlayerCity.getPosY()
-                        ,c.getPosX(), c.getPosY());
+                City c = gameData.getCityByName(cityName);
+                if (c == null) {
+                    System.err.println("what!!, neighbor is not found:" + cityName);
+                    Platform.exit();
+                }
+                if (currentPlayerCity == null) {
+                    System.err.println("player current city is notfoudn!!"
+                            + gameData.getCurrentPlayer().getCurrentCity());
+                    Platform.exit();
+                }
+                if (currentPlayerCity.getMapId() == currrentMap
+                        && c.getMapId() == currrentMap) {
+                    cg.setStroke(Color.RED);
+                    cg.setLineWidth(2);
+                    cg.strokeLine(currentPlayerCity.getPosX(), currentPlayerCity.getPosY(), c.getPosX(), c.getPosY());
+                }
             }
         }
         
+        //show green line to neighbor cities.
+        if (gameData.getCurrentPlayer().isWaitingOnHarbor()) {
+            ArrayList<String> playerSeaNeighbors
+                    = gameData.getGameMap().getHarborNeighbors(
+                            gameData.getCurrentPlayer().getCurrentCity());
+            City currentPlayerCity = gameData.getCityByName(
+                    gameData.getCurrentPlayer().getCurrentCity());
+            if (playerSeaNeighbors != null) {
+                for (String cityName : playerSeaNeighbors) {
+                    City c = gameData.getCityByName(cityName);
+                    if (c == null) {
+                        System.err.println("what!!, neighbor is not found:" + cityName);
+                        Platform.exit();
+                    }
+                    if (currentPlayerCity == null) {
+                        System.err.println("player current city is notfoudn!!"
+                                + gameData.getCurrentPlayer().getCurrentCity());
+                        Platform.exit();
+                    }
+                    if (currentPlayerCity.getMapId() == currrentMap
+                            && c.getMapId() == currrentMap) {
+                        cg.setStroke(Color.GREEN);
+                        cg.setLineWidth(2);
+                        cg.strokeLine(currentPlayerCity.getPosX(), currentPlayerCity.getPosY(), c.getPosX(), c.getPosY());
+                    }
+                }
+            }
+        }
         
         //render cards
         refreshCards();
@@ -159,7 +188,7 @@ public class JourneyGameRenderer {
         int h = Integer.parseInt(props.getProperty(Main.JourneyPropertyType.GAME_HEIGHT));
         int w = Integer.parseInt(props.getProperty(Main.JourneyPropertyType.GAME_WIDTH));
         cg.clearRect(0, 0, w, h);
-        System.out.println("map id is: " +gameData.getCurrentMap());
+
         int mapId = gameData.getCurrentMap();
         if (mapId == 0) {
             cg.drawImage(map0, 0, 0);      
@@ -216,7 +245,7 @@ public class JourneyGameRenderer {
 
             @Override
             public void handle(long now) {
-                System.out.println("");
+
                 if (before == -1) {
                     System.out.println("deltax :" + deltaX);
                     System.out.println("deltay :" + deltaY);
@@ -230,7 +259,6 @@ public class JourneyGameRenderer {
                 
                 if (time == endTime) {
                     
-                    System.out.println("times up");
                     render();
                     gameData.setState(JourneyGameManager.GameState.IN_MOVE);
                     gameData.setRemainingMove(gameData.getRemainingMove() - 1);
