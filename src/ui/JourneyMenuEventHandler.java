@@ -63,6 +63,9 @@ public class JourneyMenuEventHandler {
                 + "worst game I have ever played");
             ui.getGamePane().toFront();
             ui.getGameHandler().showInitEffects();
+            if (!fileManager.getGameData().getCurrentPlayer().isIsHuman()) {
+                ui.getGameHandler().getGameManager().computerMove();
+            }
         }   
     }
     

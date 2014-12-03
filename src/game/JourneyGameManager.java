@@ -12,12 +12,16 @@ import game.data_container.FlightCluster;
 import game.data_container.FlightCluster.Flight;
 import game.data_container.Player;
 import game.file.JourneyFileManager;
+import java.time.Duration;
 import java.util.ArrayList;
+import java.util.TreeSet;
+import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.Text;
+import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 import properties_manager.PropertiesManager;
 import sun.nio.ch.NativeThread;
 import ui.Main;
@@ -35,7 +39,8 @@ public class JourneyGameManager {
      * MOVING_EFFECT: in the state of animation for moving
      */
     public static enum GameState {
-        WAIT_DICE, IN_MOVE, NEXT_PLAYER, MOVING_EFFECT
+        WAIT_DICE, IN_MOVE, NEXT_PLAYER, MOVING_EFFECT,
+        COMPUTER
     }
     
     private JourneyFileManager fileManager;
@@ -247,6 +252,9 @@ public class JourneyGameManager {
             renderer.render();
             gameData.setState(GameState.WAIT_DICE);
             displayMsg("next player roll the dice");
+            if (!currentPlayer.isIsHuman()) {
+                computerMove();
+            }
             return;   
         }
         
@@ -276,6 +284,9 @@ public class JourneyGameManager {
             renderer.render();
             gameData.setState(GameState.WAIT_DICE);
             displayMsg("waiting on the harbor. next player roll the dice");
+            if (!currentPlayer.isIsHuman()) {
+                computerMove();
+            }
             return;
         }
         
@@ -352,8 +363,81 @@ public class JourneyGameManager {
         return false;
     }
     
+    public void computerMove() {
+        //TODO make the computer move
+        //set the state.
+        gameData.setState(GameState.COMPUTER);
+        AnimationTimer timer;
+        timer = new AnimationTimer() {
+            private int remMoves = -1;
+            private long before = -1;
+            private final long interval = Duration.ofSeconds(3).toNanos();
+            private boolean ended = false;
+            private ArrayList<String> route = gameData.getGameMap()
+                    .getShortestPath(gameData.getCurrentPlayer().getCurrentCity()
+                            ,gameData.getCurrentPlayer().getCardsOnHand().get(0).getCityName());
+            
+            @Override
+            public void handle(long now) {
+                
+                if (remMoves == -1) {
+                    //init before
+                    before = now;
+                    
+                    //init computer player related stuff.
+                    renderer.render();
+                    gameData.getDice().roll();
+                    remMoves = gameData.getDice().getDiceNum();
+                    renderer.showDiceAnimation();
+                    if (route ==  null) {
+                        System.err.println("no routes!!");
+                        Platform.exit();
+                    }
+                }
+                
+                if (remMoves  == 0) {
+                    if (now - before > 1000000000) {
+                        this.stop();
+                        if (!ended) {
+                            gameData.setState(GameState.NEXT_PLAYER);
+                            JourneyGameManager.this.endOfTurn();
+                        }
+                    }
+                }
+                
+                
+                if (now - before > interval && remMoves > 0) {
+                    System.out.println(now);
+                    before = now;
+                    remMoves--;
+                    String nextCity = route.get(0)+"";
+                    route.remove(0);
+                    displayMsg(gameData.getCurrentPlayer().getPlayerName() +
+                            " moving to " + nextCity);
+                    if (gameData.getCurrentMap() == gameData.getCityByName(nextCity).getMapId()) {
+                        renderer.showMoving(gameData.getCurrentPlayer().getCurrentCity(), nextCity);
+                        gameData.getCurrentPlayer().setCurrentCity(nextCity);
+                    } else {
+                        gameData.getCurrentPlayer().setCurrentCity(nextCity);
+                        renderer.render();
+                    }
+                    if (checkCards(nextCity)) {
+                        gameData.setState(GameState.NEXT_PLAYER);
+                        JourneyGameManager.this.endOfTurn();
+                        remMoves = 0;
+                        ended = true;
+                    }    
+                    
+                }
+                
+            }
+        };
+        timer.start();
+        return;
+    }
     
-    private void checkCards(String arrivedCity) {
+    
+    private boolean checkCards(String arrivedCity) {
         //check if the user has visit a city with cards on the hand
         for (Card c : gameData.getCurrentPlayer().getCardsOnHand()) {
             if (c.getCityName().equals(arrivedCity)) {
@@ -362,9 +446,12 @@ public class JourneyGameManager {
                 displayMsg("a card on your hand has arrived: " + c.getCityName());
                 gameData.getCurrentPlayer().getCardsOnHand().remove(c);
                 renderer.refreshCards();
+                return true;
             }
         }
+        return false;
     }
+    
     
     public void displayMsg(String msg) {
         renderer.changeMsg(msg);

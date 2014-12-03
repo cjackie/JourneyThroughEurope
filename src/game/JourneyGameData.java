@@ -108,7 +108,7 @@ public class JourneyGameData {
                 String piecePath = dataPath + pieceFormat.replace('?', (char)('0'+i));
                 //generate a random city to land on
                 String aCity = allCities.get(i).getName();
-                Player p = new Player(aCity, false, piecePath, flightPlan,key);
+                Player p = new Player(aCity, true, piecePath, flightPlan,key);
                 dealCards(p);
                 allPlayers.add(p);
             }   
