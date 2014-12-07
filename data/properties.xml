@@ -62,6 +62,7 @@
         <property name="PIECE_PATH_FORMAT"          value="piece?.png"></property>
         <property name="FLIGHT_TXT"                 value="flight_cluster.txt"></property> 
         <property name="SAVED_DATA_TEXT"            value="saved_data.txt"></property>
+        <property name="TOWN_INFO_TEXT"             value="town_info.txt"></property>
         <property name="NUM_FLIGHT_PLANS"           value="3"></property>    
     </property_list>
     <property_options_list>

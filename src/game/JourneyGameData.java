@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.TreeSet;
 import javafx.application.Platform;
+import javax.print.DocFlavor;
 import properties_manager.PropertiesManager;
 import ui.Main;
 
@@ -48,6 +49,7 @@ public class JourneyGameData {
     private ArrayList<Card> redCards;
     private ArrayList<Card> greenCards;
     private ArrayList<Card> yellowCards;
+    private HashMap<String,String> townInfos;
     public static String historyContent;
 
 
@@ -73,6 +75,9 @@ public class JourneyGameData {
         
         //setting up cards
         initAllCards();
+        
+        //setting up town infos.
+        initTownInfo();
         
         //initialize the history 
         historyContent = "";
@@ -360,7 +365,24 @@ public class JourneyGameData {
         gameMap = new GameMap();
     }
     
-    
+    private void initTownInfo() {
+        PropertiesManager props = PropertiesManager.getPropertiesManager();
+        String infoFilePath = props.getProperty(Main.JourneyPropertyType.DATA_PATH) +
+                props.getProperty(Main.JourneyPropertyType.TOWN_INFO_TEXT);
+        List<String> lines = getFile(infoFilePath);
+        townInfos = new HashMap<>();
+        for (String line : lines) {
+            try {
+                String[] tokens = line.split("%");
+                if (tokens.length != 2) 
+                    continue;
+                townInfos.put(tokens[0],tokens[1]);       
+            } catch (Exception e) {
+                System.err.println("error line :" + line);
+            }
+        }
+    }
+
     private void dealCards(Player p) {
         ArrayList<Card> cardsOnHand = new ArrayList<>();
         
@@ -468,6 +490,10 @@ public class JourneyGameData {
 
     public int getCurrentMap() {
         return currentMap;
+    }
+    
+    public HashMap<String, String> getTownInfos() {
+        return townInfos;
     }
 
     public void setGameMap(GameMap gameMap) {

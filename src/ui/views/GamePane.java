@@ -30,6 +30,7 @@ public class GamePane extends BorderPane {
     private VBox leftSection;
     private VBox cardSection;
     private ScrollPane msgBoard;
+    private ScrollPane townInfoBoard;
     private VBox rightSection;
     private ImageView diceImg;
     private Button selectMapBtn;
@@ -59,6 +60,9 @@ public class GamePane extends BorderPane {
         msgBoard = new ScrollPane();
         msgBoard.setHbarPolicy(ScrollBarPolicy.NEVER);
         msgBoard.setVbarPolicy(ScrollBarPolicy.ALWAYS);
+        townInfoBoard = new ScrollPane();
+        townInfoBoard.setHbarPolicy(ScrollBarPolicy.NEVER);
+        townInfoBoard.setVbarPolicy(ScrollBarPolicy.ALWAYS);
         leftSection.getChildren().addAll(cardSection);
         
         rightSection = new VBox();
@@ -77,7 +81,7 @@ public class GamePane extends BorderPane {
         quitBtn = new Button(
                 props.getProperty(Main.JourneyPropertyType.QUIT_BTN));
         rightSection.getChildren().addAll(moves, diceImg, flightBtn, selectMapBtn, endBtn,
-                                        historyBtn, aboutBtn, quitBtn,msgBoard);
+                                        historyBtn, aboutBtn, quitBtn,msgBoard,townInfoBoard);
         rightSection.setPrefWidth(
             Integer.parseInt(props.getProperty(Main.JourneyPropertyType.RIGHT_SEC_WIDTH))
         );
@@ -144,5 +148,9 @@ public class GamePane extends BorderPane {
     
     public Button getSelectMapBtn() {
         return selectMapBtn;
+    }
+    
+    public ScrollPane getTownInfoBoard() {
+        return townInfoBoard;
     }
 }

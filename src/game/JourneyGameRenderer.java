@@ -161,7 +161,18 @@ public class JourneyGameRenderer {
         //render cards
         refreshCards();
         
-           
+        //town info display
+        if (gameData.getTownInfos().containsKey(
+                gameData.getCurrentPlayer().getCurrentCity())) {
+            Text t = new Text(gameData.getTownInfos().get(
+                    gameData.getCurrentPlayer().getCurrentCity()));
+            t.setWrappingWidth(180);
+            ui.getGamePane().getTownInfoBoard().setContent(t);
+        } else {
+            Text t = new Text("NA");
+            t.setWrappingWidth(180);
+            ui.getGamePane().getTownInfoBoard().setContent(t);
+        }
     }
     
     public void refreshCards() {
