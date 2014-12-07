@@ -8,6 +8,7 @@ package ui.views;
 
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.image.ImageView;
@@ -38,7 +39,9 @@ public class GamePane extends BorderPane {
     private Button aboutBtn;
     private Button quitBtn;
     private StackPane gameContainer;
-    
+    private Label moves;
+
+
     
     public GamePane() {
         PropertiesManager props = PropertiesManager.getPropertiesManager();
@@ -59,6 +62,7 @@ public class GamePane extends BorderPane {
         leftSection.getChildren().addAll(cardSection);
         
         rightSection = new VBox();
+        moves = new Label("Remaining moves: ");
         diceImg = new ImageView();
         flightBtn = new Button(
                 props.getProperty(Main.JourneyPropertyType.FLIGHT_BTN));
@@ -72,7 +76,7 @@ public class GamePane extends BorderPane {
                 props.getProperty(Main.JourneyPropertyType.ABOUT_BTN));
         quitBtn = new Button(
                 props.getProperty(Main.JourneyPropertyType.QUIT_BTN));
-        rightSection.getChildren().addAll(diceImg, flightBtn, selectMapBtn, endBtn,
+        rightSection.getChildren().addAll(moves, diceImg, flightBtn, selectMapBtn, endBtn,
                                         historyBtn, aboutBtn, quitBtn,msgBoard);
         rightSection.setPrefWidth(
             Integer.parseInt(props.getProperty(Main.JourneyPropertyType.RIGHT_SEC_WIDTH))
@@ -88,6 +92,11 @@ public class GamePane extends BorderPane {
     public Canvas getGameCanvas() {
         return gameCanvas;
     }
+    
+    public Label getMoves() {
+        return moves;
+    }
+    
 
     public ScrollPane getMsgBoard() {
         return msgBoard;

@@ -6,12 +6,14 @@
 
 package ui.views;
 
+import game.JourneyGameData;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.text.Text;
 import properties_manager.PropertiesManager;
@@ -48,6 +50,8 @@ public class HistoryPane extends BorderPane{
         if (historyContent == null) {
             historyContent = new ScrollPane();
             historyContent.setFitToWidth(true);
+            historyContent.setHbarPolicy(ScrollBarPolicy.NEVER);
+            historyContent.setVbarPolicy(ScrollBarPolicy.ALWAYS);
         }
         PropertiesManager props = PropertiesManager.getPropertiesManager();
         String textName = props.getProperty(Main.JourneyPropertyType.HISTORY_TEXT);
@@ -76,7 +80,15 @@ public class HistoryPane extends BorderPane{
                 Integer.parseInt(props.getProperty(Main.JourneyPropertyType.WINDOW_WIDTH))
         );
         historyContent.setContent(t);
-        return;
+    }
+    
+    public void refreshFromGameData() {
+        PropertiesManager props = PropertiesManager.getPropertiesManager();
+        Text t = new Text(JourneyGameData.historyContent);
+        t.setWrappingWidth(
+                Integer.parseInt(props.getProperty(Main.JourneyPropertyType.WINDOW_WIDTH))
+        );
+        historyContent.setContent(t);
     }
     
     public Button getGoBackBtn() {

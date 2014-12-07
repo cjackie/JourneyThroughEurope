@@ -48,6 +48,7 @@ public class JourneyGameData {
     private ArrayList<Card> redCards;
     private ArrayList<Card> greenCards;
     private ArrayList<Card> yellowCards;
+    public static String historyContent;
 
 
     
@@ -73,12 +74,55 @@ public class JourneyGameData {
         //setting up cards
         initAllCards();
         
-        
+        //initialize the history 
+        historyContent = "";
         //TODO
         /*
         currentPlayer and humanPlayers are specified later by the user
         or load it from the file.
         */
+    }
+    
+    public void loadGame(String currentPlayer, int remainingMoves, String state, 
+            ArrayList<Player> players, String historyContent) {
+        Player currentP = null;
+        for (Player p : players) {
+            if (p.getPlayerName().equals(currentPlayer)) {
+                currentP = p;
+                break;
+            }
+        }
+        if (currentP == null) {
+            System.err.println("what!!! no current player when loading!!");
+            Platform.exit();
+        }
+        
+        this.currentPlayer = currentP;
+        this.remainingMove = remainingMoves;
+        
+        JourneyGameManager.GameState resultState = null;
+        if (state.equals(JourneyGameManager.GameState.COMPUTER.toString()))
+            resultState = JourneyGameManager.GameState.COMPUTER;
+        else if (state.equals(JourneyGameManager.GameState.IN_MOVE.toString()))
+            resultState = JourneyGameManager.GameState.IN_MOVE;
+        else if (state.equals(JourneyGameManager.GameState.MOVING_EFFECT.toString()))
+            resultState = JourneyGameManager.GameState.MOVING_EFFECT;
+        else if (state.equals(JourneyGameManager.GameState.NEXT_PLAYER.toString()))
+            resultState = JourneyGameManager.GameState.NEXT_PLAYER;
+        else if (state.equals(JourneyGameManager.GameState.WAIT_DICE.toString()))
+            resultState = JourneyGameManager.GameState.WAIT_DICE;
+        else if (state.equals(JourneyGameManager.GameState.WON.toString()))
+            resultState = JourneyGameManager.GameState.WON;
+        
+        if (resultState == null) {
+            System.err.println("what!!! no state found"
+                    + " when loading!!");
+            Platform.exit();
+        }
+        this.state = resultState;
+        
+        this.allPlayers = players;
+        JourneyGameData.historyContent = historyContent;
     }
     
     public void constructNewGame(HashMap<String, Integer> config) {
@@ -102,7 +146,7 @@ public class JourneyGameData {
                 //generate a random city to land on
                 String aCity = allCities.get(i).getName();
                     Player p = new Player(aCity, false, piecePath, flightPlan,key);
-                dealCards(p);
+                dealCardsForComputer(p);
                 allPlayers.add(p);
             } else {
                 String piecePath = dataPath + pieceFormat.replace('?', (char)('0'+i));
@@ -328,6 +372,44 @@ public class JourneyGameData {
         cardsOnHand.add(yellowCards.get(i));
         
         p.setCardsOnHand(cardsOnHand); 
+    }
+    
+    private void dealCardsForComputer(Player p) {
+        
+        ArrayList<Card> cardsOnHand = new ArrayList<>();
+        String currentCity = p.getCurrentCity();
+        while (cardsOnHand.size() < 1) {
+            int i = (int)(Math.random() * redCards.size());
+            Card c = redCards.get(i);
+            if (gameMap.getShortestPath(currentCity, c.getCityName()) != null)
+                cardsOnHand.add(c);
+        }
+        while (cardsOnHand.size() < 2) {
+            int i = (int)(Math.random() * greenCards.size());
+            Card c = greenCards.get(i);
+            if (gameMap.getShortestPath(currentCity, c.getCityName()) != null)
+                cardsOnHand.add(c);
+        }
+        while (cardsOnHand.size() < 3) {
+            int i = (int)(Math.random() * yellowCards.size());
+            Card c = yellowCards.get(i);
+            if (gameMap.getShortestPath(currentCity, c.getCityName()) != null)
+                cardsOnHand.add(c);
+        }
+        p.setCardsOnHand(cardsOnHand);
+    }
+    
+    
+    //return null if not found
+    public Card getCardByName(String cityName) {
+        Card card = null;
+        for (Card c : cards) {
+            if (c.getCityName().equals(cityName)) {
+                card = c;
+                break;
+            }
+        }
+        return card;
     }
     
     private List<String> getFile(String filePath) {

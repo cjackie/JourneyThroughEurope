@@ -7,6 +7,7 @@
 package game;
 
 import game.data_container.Card;
+import game.data_container.Player;
 import javafx.scene.input.MouseEvent;
 
 /**
@@ -24,7 +25,19 @@ public class JourneyGameEventHandler {
     }
     
     public Boolean moveTo(MouseEvent e) {
-        return gameManager.moveTo(e.getX(), e.getY());
+        if (gameManager.moveTo(e.getX(), e.getY())) {
+            Player p = gameManager.getGameData().getCurrentPlayer();
+            gameManager.displayMsg("move to " + p.getCurrentCity() 
+                    + " successfully!" + "You have "
+                    + (gameManager.getGameData().getRemainingMove() - 1)
+                    +" remainning moves."); 
+            JourneyGameData.historyContent += p.getPlayerName() +" moved to " 
+                            +gameManager.getGameData().getCurrentPlayer().getCurrentCity()
+                            + " and had " + (gameManager.getGameData().getRemainingMove()-1) 
+                            + " moves left\n";
+            return true;
+        }
+        return false;
     }
     
     public void respondToCardClick(Card c) {
@@ -55,6 +68,7 @@ public class JourneyGameEventHandler {
     public void respondToDragRelease(MouseEvent e) {
         //TODO
         gameManager.respondToDragRelease(e.getX(), e.getY());
+        gameManager.getRenderer().updateMoveNumber();
     }
     
     public void SelectMap(int id) {
@@ -64,7 +78,8 @@ public class JourneyGameEventHandler {
     }
     
     public Boolean flightTo(MouseEvent e) {
-        return gameManager.flightTo(e.getX(), e.getY());
+        boolean t = gameManager.flightTo(e.getX(), e.getY());
+        return t;
     }
     
     public void respondToSave() {
@@ -72,11 +87,13 @@ public class JourneyGameEventHandler {
     }
     
     public void refresh() {
+        gameManager.getRenderer().updateMoveNumber();
         gameManager.render();
     }
     
     public Boolean rollDce() {
-        return gameManager.rollDice();
+        boolean t = gameManager.rollDice();
+        return t;
     }
     
     

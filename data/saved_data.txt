@@ -1,0 +1,35 @@
+6,c6,1,COMPUTER
+c3,0,ARHUS,GALATI,EDIRNE
+c4,0,DOVER,BRISTOL,ZAGREB,ROMA
+c5,0,PARIS,GLASGOW,MISKOLC,ISTANBUL
+c6,0,KOLN,ARKHANGEL,LODZ,VALLADOLID
+c1,0,RENNES,LONDON,BRUXELLES,PALERMO
+c2,0,MOSKVA,BUCURESTI,CATANIA
+c3 moved to STRASBOURG and had 5 moves left
+c3 moved to FRANKFURT and had 4 moves left
+c3 moved to KASSEL and had 3 moves left
+c3 moved to HANNOVER and had 2 moves left
+c3 moved to BREMEN and had 1 moves left
+c3 moved to KIEL and had 0 moves left
+c4 moved to BASEL and had 1 moves left
+c4 moved to DIJON and had 0 moves left
+c5 moved to INNSBRUCK and had 1 moves left
+c5 moved to ZURICH and had 0 moves left
+c6 moved to ORLEANS and had 4 moves left
+c6 moved to PARIS and had 3 moves left
+c6 moved to REIMS and had 2 moves left
+c6 moved to BRUXELLES and had 1 moves left
+c6 moved to KOLN and had 0 moves left
+c1 moved to RENNES and had 0 moves left
+c2 moved to KRAKOW and had 4 moves left
+c2 moved to WARSZAWA and had 3 moves left
+c2 moved to MINSK and had 2 moves left
+c2 moved to SMOLENSK and had 1 moves left
+c2 moved to MOSKVA and had 0 moves left
+c3 moved to ARHUS and had 4 moves left
+c4 moved to PARIS and had 2 moves left
+c4 moved to CALAIS and had 1 moves left
+c4 moved to DOVER and had 0 moves left
+c5 moved to BASEL and had 2 moves left
+c5 moved to DIJON and had 1 moves left
+c5 moved to PARIS and had 0 moves left

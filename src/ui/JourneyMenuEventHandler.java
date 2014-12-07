@@ -38,7 +38,9 @@ public class JourneyMenuEventHandler {
     }
     
     public void respondToLoadBtn() {
+        ui.getGamePane().toFront();
         fileManager.load();
+        ui.getGameHandler().getGameManager().resume();
     }
     
     public void respondToAboutBtn() {
@@ -89,8 +91,10 @@ public class JourneyMenuEventHandler {
     }
     
     public void respondToHistoryBtn() {
-        ui.getHistoryPane().refresh();
+        //TODO the line below is deprecated should be moved to fileManager
+        //ui.getHistoryPane().refresh();
         ui.getHistoryPane().toFront();
+        ui.getHistoryPane().refreshFromGameData();
     }
     
     public void respondToBackBtn(Pane p) {

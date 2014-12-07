@@ -12,6 +12,9 @@ import game.data_container.FlightCluster;
 import game.data_container.FlightCluster.Flight;
 import game.data_container.Player;
 import game.file.JourneyFileManager;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.TreeSet;
@@ -24,6 +27,7 @@ import javafx.scene.text.Text;
 import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 import properties_manager.PropertiesManager;
 import sun.nio.ch.NativeThread;
+import ui.JourneyUI;
 import ui.Main;
 
 /**
@@ -40,13 +44,14 @@ public class JourneyGameManager {
      */
     public static enum GameState {
         WAIT_DICE, IN_MOVE, NEXT_PLAYER, MOVING_EFFECT,
-        COMPUTER
+        COMPUTER, WON
     }
     
     private JourneyFileManager fileManager;
     private JourneyGameData gameData;
     private JourneyGameRenderer renderer;
     private boolean isDraged = false;
+    private boolean finished = false;
     
     public JourneyGameManager() {}
     
@@ -55,6 +60,9 @@ public class JourneyGameManager {
     }
     
     public Boolean moveTo(double x, double y) {
+        if (finished) {
+            return false;
+        }
         if (!gameData.getState().equals(GameState.IN_MOVE)) {
             displayMsg("can't move yet");
             return false;
@@ -81,7 +89,6 @@ public class JourneyGameManager {
         if (cityClicked == null) {
             this.displayMsg("click again..");
         } else{
-            this.displayMsg(cityClicked.getName() + " is clicked!!");
             String cityFrom = this.gameData.getCurrentPlayer().getCurrentCity();
             String cityTo = cityClicked.getName();
             if (gameData.getGameMap().hasEdge(cityFrom, cityTo)) {
@@ -90,6 +97,7 @@ public class JourneyGameManager {
                 gameData.setState(GameState.MOVING_EFFECT);
                 renderer.showMoving(cityFrom, cityTo);
                 this.checkCards(cityTo);
+                return true;
             } else if (gameData.getCurrentPlayer().isWaitingOnHarbor()){
                 
                 if (gameData.getGameMap().neighborHarbor(cityFrom, cityTo)) {
@@ -99,6 +107,9 @@ public class JourneyGameManager {
                     renderer.showMoving(cityFrom, cityTo);
                     this.checkCards(cityTo);
                     displayMsg("take the boat to " + cityTo);
+                    JourneyGameData.historyContent += gameData.getCurrentPlayer().getPlayerName() 
+                        +" took the boat to " + cityTo+ " successfully and had " + 
+                        (gameData.getRemainingMove()) + " moves left\n";
                 }
             } else {
                 displayMsg("moving to "+cityTo+" is not valid");
@@ -144,6 +155,7 @@ public class JourneyGameManager {
         }
         
         int moves = gameData.getRemainingMove();
+        System.out.println("remaining moves:" + moves);
         if (req.equals(FlightCluster.FLIGHT_REQUIREMENT.DICE_2)) {
             if (moves >= 2) {
                 gameData.getCurrentPlayer().setWaitingOnHarbor(false);
@@ -153,6 +165,13 @@ public class JourneyGameManager {
                 renderer.getUi().getGamePane().toFront();
                 renderer.render(); 
                 displayMsg("successfully flew to " + flightTo);
+                JourneyGameData.historyContent += gameData.getCurrentPlayer().getPlayerName() 
+                        +" flew to " + flightTo + " successfully and had " + 
+                        (gameData.getRemainingMove()) + " moves left\n";
+                if (moves-2 == 0) {
+                    gameData.setState(GameState.NEXT_PLAYER);
+                    this.endOfTurn();
+                }
                 return true;
             } else {
                 displayMsg("Not enough dice point to flight to that city");
@@ -171,6 +190,13 @@ public class JourneyGameManager {
                 renderer.getUi().getGamePane().toFront();
                 renderer.render(); 
                 displayMsg("successfully flew to " + flightTo);
+                JourneyGameData.historyContent += gameData.getCurrentPlayer().getPlayerName() 
+                        +" flew to " + flightTo + " successfully and had " + 
+                        (gameData.getRemainingMove()) + " moves left\n";
+                if (moves-4 == 0) {
+                    gameData.setState(GameState.NEXT_PLAYER);
+                    this.endOfTurn();
+                }
                 return true;
             } else {
                 displayMsg("Not enough dice point to flight to that city");
@@ -184,7 +210,7 @@ public class JourneyGameManager {
     }
     
     public void cardClick(Card card) {
-        //TODO
+
         for (Node v : 
                 renderer.getUi().getGamePane().getCardSection().getChildren()){
             if (((ImageView) v).getImage() == card.getFrontImg()) {
@@ -208,7 +234,79 @@ public class JourneyGameManager {
     
     public void save() {
         System.out.println("save btn clicked.");
+        PropertiesManager props = PropertiesManager.getPropertiesManager();
+        String path = props.getProperty(Main.JourneyPropertyType.DATA_PATH)
+                + props.getProperty(Main.JourneyPropertyType.SAVED_DATA_TEXT);
+        int numberOfPlayer = gameData.getAllPlayers().size();
+        int numberOfMoves = gameData.getRemainingMove();
+        BufferedWriter writer = null;
+        try {
+            File logFile = new File(path);
+            writer = new BufferedWriter(new FileWriter(logFile));
+            writer.write(numberOfPlayer+","+gameData.getCurrentPlayer().getPlayerName()+
+                    ","+numberOfMoves+",");
+            writer.write(gameData.getState().toString()+"\n");
+            for (Player p : gameData.getAllPlayers()) {
+                //player(1) or computer player(0);
+                if (p.isIsHuman()) {
+                    writer.write(p.getPlayerName()+","+1+","+p.getCurrentCity());
+                    for (Card c : p.getCardsOnHand()) {
+                        writer.write(","+c.getCityName());
+                    }
+                    writer.write("\n");
+                } else {
+                    writer.write(p.getPlayerName()+","+0+","+p.getCurrentCity());
+                    for (Card c : p.getCardsOnHand()) {
+                        writer.write(","+c.getCityName());
+                    }
+                    writer.write("\n");
+                }
+            }
+            writer.write(JourneyGameData.historyContent);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                // Close the writer regardless of what happens...
+                writer.close();
+            } catch (Exception e) {
+            }
+        }
         //TODO
+    }
+    
+    public void resume() {
+        renderer.render();
+        switch (gameData.getState()) {
+            case COMPUTER :
+                computerMove();
+                break;
+            case IN_MOVE :
+                displayMsg("welcome back, you have points left, "
+                        + "please choose your move");
+                if (!gameData.getCurrentPlayer().isIsHuman())
+                    computerMove();
+                break;
+            case MOVING_EFFECT:
+                displayMsg("welcome back, you have points left, "
+                        + "please choose your move");
+                if (!gameData.getCurrentPlayer().isIsHuman())
+                    computerMove();
+                break;
+            case NEXT_PLAYER:
+                this.endOfTurn();
+                break;
+            case WAIT_DICE:
+                displayMsg(gameData.getCurrentPlayer().getPlayerName()+"'s turn,"
+                            +" roll the dice");
+                if (!gameData.getCurrentPlayer().isIsHuman())
+                    computerMove();
+                break;
+            case WON:
+                displayMsg(gameData.getCurrentPlayer().getPlayerName()+" has "
+                            +" won the game");
+                break;
+        }
     }
     
     public Boolean rollDice() {
@@ -229,8 +327,14 @@ public class JourneyGameManager {
     
     public void endOfTurn() {
         //TODO. this is where computer might start do the job
-        System.out.println("require to end turn");
+        if (finished){
+            displayMsg("Congratulation, "+gameData.getCurrentPlayer().getPlayerName()
+                                    +"!!" +" You have won the game!!!");
+            renderer.showGameOver();
+            return;
+        }
         if (gameData.getState().equals(GameState.NEXT_PLAYER)) {
+            
             //ready to move on to the next player
             Player currentPlayer = gameData.getCurrentPlayer();
             int index;
@@ -251,16 +355,21 @@ public class JourneyGameManager {
             gameData.setCurrentPlayer(currentPlayer);
             renderer.render();
             gameData.setState(GameState.WAIT_DICE);
-            displayMsg("next player roll the dice");
+            displayMsg(currentPlayer.getPlayerName()+"'s turn. Please roll the dice");
             if (!currentPlayer.isIsHuman()) {
                 computerMove();
             }
             return;   
+        } else {
+            displayMsg("can't end the turn. You have "+ gameData.getRemainingMove() 
+                    +" remainning moves.");
+            
         }
         
         if (gameData.getGameMap().getHarborNeighbors(
                 gameData.getCurrentPlayer().getCurrentCity()) != null 
-                /*&& !gameData.getCurrentPlayer().isWaitingOnHarbor()*/) {
+                && !gameData.getCurrentPlayer().isWaitingOnHarbor()
+                && !gameData.getState().equals(GameState.COMPUTER)) {
             gameData.getCurrentPlayer().setWaitingOnHarbor(true);
             
             //ready to move on to the next player
@@ -288,9 +397,16 @@ public class JourneyGameManager {
                 computerMove();
             }
             return;
+        } else if (!gameData.getState().equals(GameState.COMPUTER)
+                && gameData.getGameMap().getHarborNeighbors(
+                gameData.getCurrentPlayer().getCurrentCity()) == null ) {
+            displayMsg("Can't end the turn. It's not a harbor that you can wait!"
+                +"You have "+ gameData.getRemainingMove() +" remainning moves.");
+        } else if (gameData.getState().equals(GameState.COMPUTER)) {
+            displayMsg("Computer is moving, please wait!");
         }
         
-        displayMsg("can't end the turn");
+        
     }
     
     public void selectMap(int id) {
@@ -334,7 +450,11 @@ public class JourneyGameManager {
                 //TIP!!!!!!!!!!!!  comment this to debug the map data structure
                 
                 gameData.setRemainingMove(gameData.getRemainingMove() - 1);
-                displayMsg("move remaining:" + getGameData().getRemainingMove());
+                displayMsg(gameData.getCurrentPlayer().getPlayerName() + " moved to" 
+                        + c.getName() + "successfully!! " +
+                        "move remaining:" + getGameData().getRemainingMove());
+                JourneyGameData.historyContent += gameData.getCurrentPlayer().getPlayerName() +" moved to " 
+                            + c.getName() + " and had " + (gameData.getRemainingMove()) + " moves left\n";
                 if (gameData.getRemainingMove() == 0) {
                     gameData.setState(GameState.NEXT_PLAYER);
                 }
@@ -359,7 +479,8 @@ public class JourneyGameManager {
     }
     
     public Boolean won() {
-        //TODO
+        if (gameData.getCurrentPlayer().getCardsOnHand().size() == 0)
+            return true;
         return false;
     }
     
@@ -371,7 +492,7 @@ public class JourneyGameManager {
         timer = new AnimationTimer() {
             private int remMoves = -1;
             private long before = -1;
-            private final long interval = Duration.ofSeconds(3).toNanos();
+            private final long interval = Duration.ofMillis(1500).toNanos();
             private boolean ended = false;
             private ArrayList<String> route = gameData.getGameMap()
                     .getShortestPath(gameData.getCurrentPlayer().getCurrentCity()
@@ -388,8 +509,11 @@ public class JourneyGameManager {
                     renderer.render();
                     gameData.getDice().roll();
                     remMoves = gameData.getDice().getDiceNum();
+                    gameData.setRemainingMove(remMoves);
                     renderer.showDiceAnimation();
                     if (route ==  null) {
+                        System.err.println("the city from " + gameData.getCurrentPlayer().getCurrentCity()
+                        + " to " + gameData.getCurrentPlayer().getCardsOnHand().get(0).getCityName());
                         System.err.println("no routes!!");
                         Platform.exit();
                     }
@@ -398,32 +522,40 @@ public class JourneyGameManager {
                 if (remMoves  == 0) {
                     if (now - before > 1000000000) {
                         this.stop();
-                        if (!ended) {
-                            gameData.setState(GameState.NEXT_PLAYER);
-                            JourneyGameManager.this.endOfTurn();
-                        }
+
+                        gameData.setState(GameState.NEXT_PLAYER);
+                        JourneyGameManager.this.endOfTurn();
                     }
                 }
                 
                 
-                if (now - before > interval && remMoves > 0) {
-                    System.out.println(now);
+                if (now - before > interval && remMoves > 0 && !finished) {
+                    
                     before = now;
                     remMoves--;
+                    gameData.setRemainingMove(remMoves);
+                    renderer.updateMoveNumber();
+                    if (route.size() == 0) {
+                        return;
+                    }
                     String nextCity = route.get(0)+"";
                     route.remove(0);
                     displayMsg(gameData.getCurrentPlayer().getPlayerName() +
                             " moving to " + nextCity);
+                    JourneyGameData.historyContent += gameData.getCurrentPlayer().getPlayerName() +" moved to " 
+                            + nextCity + " and had " + gameData.getRemainingMove()  + " moves left\n";
                     if (gameData.getCurrentMap() == gameData.getCityByName(nextCity).getMapId()) {
                         renderer.showMoving(gameData.getCurrentPlayer().getCurrentCity(), nextCity);
                         gameData.getCurrentPlayer().setCurrentCity(nextCity);
                     } else {
                         gameData.getCurrentPlayer().setCurrentCity(nextCity);
-                        renderer.render();
+                        City c = gameData.getCityByName(nextCity);
+                        gameData.setCurrentMap(c.getMapId());
+                        renderer.render(); 
                     }
                     if (checkCards(nextCity)) {
-                        gameData.setState(GameState.NEXT_PLAYER);
-                        JourneyGameManager.this.endOfTurn();
+                        if (gameData.getCurrentPlayer().getCardsOnHand().size() == 0)
+                            finished = true;
                         remMoves = 0;
                         ended = true;
                     }    
@@ -451,6 +583,7 @@ public class JourneyGameManager {
         }
         return false;
     }
+    
     
     
     public void displayMsg(String msg) {

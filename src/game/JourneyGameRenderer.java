@@ -58,10 +58,7 @@ public class JourneyGameRenderer {
         
         PropertiesManager props = PropertiesManager.getPropertiesManager();
         
-        //TODO
-        //partially done
-        //get the gameData and render it
-        
+
         GraphicsContext cg = ui.getGamePane().getGameCanvas().getGraphicsContext2D();
         int h = Integer.parseInt(props.getProperty(Main.JourneyPropertyType.GAME_HEIGHT));
         int w = Integer.parseInt(props.getProperty(Main.JourneyPropertyType.GAME_WIDTH));
@@ -163,7 +160,7 @@ public class JourneyGameRenderer {
         
         //render cards
         refreshCards();
-       
+        
            
     }
     
@@ -247,8 +244,6 @@ public class JourneyGameRenderer {
             public void handle(long now) {
 
                 if (before == -1) {
-                    System.out.println("deltax :" + deltaX);
-                    System.out.println("deltay :" + deltaY);
                     before = now;
                 }
                 
@@ -262,7 +257,8 @@ public class JourneyGameRenderer {
                     render();
                     gameData.setState(JourneyGameManager.GameState.IN_MOVE);
                     gameData.setRemainingMove(gameData.getRemainingMove() - 1);
-                    //changeMsg("moves remaining :" + gameData.getRemainingMove());
+                    updateMoveNumber();
+
                     if (gameData.getRemainingMove() == 0) {
                         gameData.setState(JourneyGameManager.GameState.NEXT_PLAYER);
                         ui.getGameHandler().getGameManager().nextPlayer();
@@ -324,6 +320,7 @@ public class JourneyGameRenderer {
                 }
                 
                 if (time  > 10 ) {
+                    updateMoveNumber();
                     if (now - before > 100000000)
                         this.stop();
                 }
@@ -355,11 +352,20 @@ public class JourneyGameRenderer {
     }
     
     public void changeMsg(String msg) {
-        //TODO
         //just chnage the scrollpane in the game pane
         Text t = new Text(msg);
         t.setWrappingWidth(180);
         ui.getGamePane().getMsgBoard().setContent(t);
+    }
+    
+    public void updateMoveNumber() {
+        //render move:
+        if (gameData.getRemainingMove() == -1 ) {
+            ui.getGamePane().getMoves().setText("Remaining move: NA");
+        } else {
+            int moves = gameData.getRemainingMove();
+            ui.getGamePane().getMoves().setText("Remaining move: " + moves);
+        }
     }
     
     
@@ -387,6 +393,23 @@ public class JourneyGameRenderer {
         }
 
         this.initImgsYet = true;
+    }
+    
+    public void showGameOver() {
+        PropertiesManager props = PropertiesManager.getPropertiesManager();
+        String congraImagePath = props.getProperty(Main.JourneyPropertyType.DATA_PATH)
+                +props.getProperty(Main.JourneyPropertyType.CONGRATZ_IMG);
+        Image v = new Image("file:"+congraImagePath);
+        
+        GraphicsContext cg = ui.getGamePane().getGameCanvas().getGraphicsContext2D();
+        int drawH = Integer.parseInt(props.getProperty(Main.JourneyPropertyType.CONGRATZ_HEIGHT));
+        int drawW = Integer.parseInt(props.getProperty(Main.JourneyPropertyType.CONGRATZ_WIDTH));
+        int h = Integer.parseInt(props.getProperty(Main.JourneyPropertyType.GAME_HEIGHT));
+        int w = Integer.parseInt(props.getProperty(Main.JourneyPropertyType.GAME_WIDTH));
+        cg.clearRect(0, 0, w, h);
+        
+        cg.drawImage(v, 0, 0);
+                    
     }
     
     public void showInitEffect() {
